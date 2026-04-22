@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GED 100 — Reading Remediation Hub 202520</title>
+<style>
+:root {
+  --cream:#FFF8EE; --warm-white:#FFFDF8; --orange:#C85A1E; --orange-lt:#E07B39;
+  --orange-pale:#FDEEE4; --navy:#1E3A5F; --navy-lt:#2C5282; --gray:#6B7280;
+  --success:#16A34A; --success-bg:#DCFCE7; --error:#DC2626; --error-bg:#FEE2E2;
+  --shadow:0 2px 12px rgba(0,0,0,.08); --shadow-lg:0 8px 30px rgba(0,0,0,.14);
+  --r:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:Georgia,'Times New Roman',serif;background:var(--cream);color:var(--navy);min-height:100vh;}
+ 
+/* HEADER */
+.hdr{background:linear-gradient(135deg,#1E3A5F 0%,#2C5282 100%);color:#fff;padding:22px 20px 18px;text-align:center;}
+.hdr-badge{display:inline-block;background:var(--orange-lt);color:#fff;font-size:11px;font-family:Arial,sans-serif;font-weight:bold;letter-spacing:2px;text-transform:uppercase;padding:4px 14px;border-radius:20px;margin-bottom:10px;}
+.hdr h1{font-size:clamp(18px,4vw,26px);font-weight:normal;margin-bottom:4px;}
+.hdr p{font-size:13px;opacity:.75;font-family:Arial,sans-serif;}
+ 
+/* PROGRESS BAR STRIP */
+.prog-strip{display:flex;gap:10px;padding:14px 20px;background:#fff;border-bottom:2px solid var(--orange-pale);flex-wrap:wrap;justify-content:center;}
+.prog-item{flex:1;min-width:150px;max-width:210px;background:var(--cream);border-radius:var(--r);padding:11px 13px;text-align:center;}
+.prog-item h4{font-size:11px;font-family:Arial,sans-serif;color:var(--gray);margin-bottom:6px;letter-spacing:.5px;}
+.prog-bar{background:#E5E7EB;border-radius:99px;height:7px;overflow:hidden;margin-bottom:4px;}
+.prog-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--orange),var(--orange-lt));transition:width .5s;}
+.prog-lbl{font-size:12px;font-family:Arial,sans-serif;color:var(--navy);font-weight:bold;}
+.badge-pass{display:inline-block;background:var(--success);color:#fff;font-size:10px;font-family:Arial,sans-serif;padding:2px 7px;border-radius:99px;margin-left:5px;}
+ 
+/* READING TABS */
+.rtabs{display:flex;background:#fff;border-bottom:3px solid var(--orange-pale);overflow-x:auto;}
+.rtab{flex:1;min-width:120px;padding:13px 10px;border:none;background:none;cursor:pointer;font-family:Georgia,serif;font-size:13px;color:var(--gray);border-bottom:3px solid transparent;margin-bottom:-3px;transition:all .2s;text-align:center;}
+.rtab:hover{color:var(--orange-lt);background:var(--orange-pale);}
+.rtab.active{color:var(--orange);border-bottom-color:var(--orange);background:var(--orange-pale);font-weight:bold;}
+.rtab-num{display:block;font-size:10px;font-family:Arial,sans-serif;letter-spacing:1px;text-transform:uppercase;opacity:.6;margin-bottom:2px;}
+ 
+/* CONTENT */
+.content{max-width:900px;margin:0 auto;padding:18px;}
+.rpanel{display:none;}
+.rpanel.active{display:block;}
+ 
+/* SUB-TABS */
+.stabs{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;}
+.stab{padding:8px 17px;border:2px solid var(--navy-lt);border-radius:99px;background:#fff;cursor:pointer;font-family:Arial,sans-serif;font-size:13px;color:var(--navy-lt);transition:all .2s;}
+.stab:hover,.stab.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+.spanel{display:none;}
+.spanel.active{display:block;}
+ 
+/* TEXT */
+.text-card{background:#fff;border-radius:var(--r);padding:26px;box-shadow:var(--shadow);font-size:15px;line-height:1.85;}
+.text-card h2{font-size:21px;color:var(--orange);margin-bottom:18px;padding-bottom:10px;border-bottom:2px solid var(--orange-pale);}
+.para-blk{margin-bottom:14px;padding:13px 15px;border-radius:8px;background:var(--warm-white);border-left:4px solid var(--orange-pale);transition:border-color .2s;}
+.para-blk:hover{border-left-color:var(--orange-lt);}
+.para-lbl{font-family:Arial,sans-serif;font-size:10px;font-weight:bold;letter-spacing:1.5px;color:var(--orange);text-transform:uppercase;margin-bottom:5px;}
+ 
+/* VOCAB */
+.vocab-intro{background:var(--orange-pale);border-radius:var(--r);padding:13px 17px;margin-bottom:16px;font-family:Arial,sans-serif;font-size:13px;color:var(--navy);}
+.vocab-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px;margin-bottom:16px;}
+.vcard{height:155px;perspective:800px;cursor:pointer;}
+.vcard-inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .5s;}
+.vcard.flipped .vcard-inner{transform:rotateY(180deg);}
+.vfront,.vback{position:absolute;inset:0;border-radius:var(--r);padding:14px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;backface-visibility:hidden;-webkit-backface-visibility:hidden;box-shadow:var(--shadow);}
+.vfront{background:#fff;border:2px solid var(--orange-pale);}
+.vword{font-size:17px;font-weight:bold;color:var(--navy);margin-bottom:4px;}
+.vpos{font-size:11px;font-family:Arial,sans-serif;color:var(--gray);font-style:italic;margin-bottom:7px;}
+.vex{font-size:11px;font-family:Arial,sans-serif;color:var(--gray);line-height:1.5;}
+.vhint{font-size:10px;font-family:Arial,sans-serif;color:var(--orange-lt);margin-top:7px;}
+.vback{background:var(--navy);color:#fff;transform:rotateY(180deg);}
+.vdef{font-size:12px;font-family:Arial,sans-serif;color:rgba(255,255,255,.8);margin-bottom:9px;line-height:1.5;}
+.varabic{font-size:22px;direction:rtl;font-family:Arial,sans-serif;color:#F0A070;font-weight:bold;}
+ 
+/* QUIZ */
+.quiz-hdr{background:#fff;border-radius:var(--r);padding:16px 18px;margin-bottom:16px;box-shadow:var(--shadow);display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.quiz-score-box{background:var(--navy);color:#fff;padding:8px 15px;border-radius:8px;font-family:Arial,sans-serif;font-size:13px;text-align:center;}
+.quiz-score-big{font-size:22px;font-weight:bold;}
+.quiz-info{flex:1;font-family:Arial,sans-serif;font-size:12px;color:var(--gray);}
+.quiz-reset{padding:7px 13px;background:none;border:2px solid var(--orange-lt);color:var(--orange);border-radius:8px;cursor:pointer;font-family:Arial,sans-serif;font-size:12px;}
+.quiz-reset:hover{background:var(--orange-lt);color:#fff;}
+ 
+.qcard{background:#fff;border-radius:var(--r);padding:18px 20px;margin-bottom:12px;box-shadow:var(--shadow);border-left:4px solid #E5E7EB;transition:border-color .3s;}
+.qcard.correct{border-left-color:var(--success);}
+.qcard.incorrect{border-left-color:var(--error);}
+.qmeta{display:flex;gap:7px;margin-bottom:9px;flex-wrap:wrap;align-items:center;}
+.qnum{background:var(--navy);color:#fff;font-family:Arial,sans-serif;font-size:11px;font-weight:bold;padding:2px 8px;border-radius:4px;}
+.qskill{background:var(--orange-pale);color:var(--orange);font-family:Arial,sans-serif;font-size:11px;padding:2px 8px;border-radius:4px;font-weight:bold;}
+.qpara{font-family:Arial,sans-serif;font-size:11px;color:var(--gray);}
+.qtext{font-size:14px;color:var(--navy);margin-bottom:12px;line-height:1.6;}
+.qopts{display:flex;flex-direction:column;gap:7px;}
+.qopt{padding:9px 13px;border:2px solid #E5E7EB;border-radius:8px;cursor:pointer;font-family:Arial,sans-serif;font-size:13px;color:var(--navy);background:var(--warm-white);text-align:left;transition:all .2s;}
+.qopt:not(:disabled):hover{border-color:var(--orange-lt);background:var(--orange-pale);}
+.qopt.sel{border-color:var(--orange-lt);background:var(--orange-pale);}
+.qopt.ok{border-color:var(--success);background:var(--success-bg);color:var(--success);font-weight:bold;}
+.qopt.wrong{border-color:var(--error);background:var(--error-bg);color:var(--error);}
+.qopt:disabled{cursor:default;}
+.qexp{margin-top:10px;padding:9px 13px;background:#F0F9FF;border-radius:8px;font-family:Arial,sans-serif;font-size:12px;color:#0369A1;display:none;line-height:1.5;}
+.qexp.show{display:block;}
+ 
+.submit-row{text-align:center;margin-top:18px;}
+.submit-btn{padding:13px 34px;background:var(--orange);color:#fff;border:none;border-radius:10px;cursor:pointer;font-family:Arial,sans-serif;font-size:15px;font-weight:bold;}
+.submit-btn:hover{background:var(--orange-lt);}
+ 
+.result-banner{border-radius:var(--r);padding:22px;text-align:center;margin-top:18px;display:none;}
+.result-banner.show{display:block;}
+.result-banner.pass{background:var(--success-bg);border:2px solid var(--success);}
+.result-banner.fail{background:var(--error-bg);border:2px solid var(--error);}
+.result-banner h3{font-size:20px;margin-bottom:7px;}
+.result-banner p{font-family:Arial,sans-serif;font-size:13px;}
+.retry-btn{margin-top:12px;padding:10px 22px;background:var(--orange);color:#fff;border:none;border-radius:8px;cursor:pointer;font-family:Arial,sans-serif;font-size:13px;}
+ 
+/* MODAL */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:1000;padding:20px;}
+.overlay.show{display:flex;}
+.modal{background:#fff;border-radius:20px;padding:38px;max-width:540px;width:100%;text-align:center;position:relative;box-shadow:var(--shadow-lg);}
+.modal-x{position:absolute;top:14px;right:16px;background:none;border:none;font-size:22px;cursor:pointer;color:var(--gray);}
+.cert-icon{font-size:60px;margin-bottom:14px;}
+.cert-title{font-size:26px;color:var(--orange);margin-bottom:7px;}
+.cert-sub{font-family:Arial,sans-serif;font-size:14px;color:var(--gray);margin-bottom:18px;}
+.cert-row{display:flex;justify-content:center;gap:16px;margin-bottom:22px;flex-wrap:wrap;}
+.cert-item{background:var(--cream);border-radius:10px;padding:11px 15px;font-family:Arial,sans-serif;font-size:12px;color:var(--navy);}
+.cert-item .big{font-size:22px;font-weight:bold;color:var(--success);display:block;}
+ 
+/* SAVE BAR */
+.save-bar{background:#fff;border-top:2px solid var(--orange-pale);padding:12px 20px;display:flex;gap:9px;align-items:center;flex-wrap:wrap;justify-content:center;}
+.save-bar button{padding:8px 15px;border-radius:8px;cursor:pointer;font-family:Arial,sans-serif;font-size:13px;border:2px solid var(--navy-lt);background:#fff;color:var(--navy-lt);}
+.save-bar button:hover{background:var(--navy);color:#fff;}
+.save-bar span{font-family:Arial,sans-serif;font-size:12px;color:var(--gray);}
+ 
+footer{background:var(--navy);color:rgba(255,255,255,.6);text-align:center;padding:13px;font-family:Arial,sans-serif;font-size:12px;}
+footer strong{color:rgba(255,255,255,.9);}
+#confettiCanvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:999;}
+ 
+@media(max-width:600px){
+  .text-card{padding:14px;}
+  .vocab-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));}
+}
+</style>
+</head>
+<body>
+<canvas id="confettiCanvas"></canvas>
+ 
+<div class="hdr">
+  <div class="hdr-badge">GED 100 &bull; 202520 &bull; SA1 Reading Remediation</div>
+  <h1>Reading Remediation Hub</h1>
+  <p>Study the text &mdash; Learn the vocabulary &mdash; Master the comprehension skills &mdash; Pass the quiz</p>
+</div>
+ 
+<div class="prog-strip">
+  <div class="prog-item">
+    <h4>&#128212; FOOD SCIENCE</h4>
+    <div class="prog-bar"><div class="prog-fill" id="bar-r1" style="width:0%"></div></div>
+    <div class="prog-lbl" id="lbl-r1">0 / 12</div>
+  </div>
+  <div class="prog-item">
+    <h4>&#127979; JAPANESE SCHOOLS</h4>
+    <div class="prog-bar"><div class="prog-fill" id="bar-r2" style="width:0%"></div></div>
+    <div class="prog-lbl" id="lbl-r2">0 / 12</div>
+  </div>
+  <div class="prog-item">
+    <h4>&#128193; STUDENT PORTFOLIOS</h4>
+    <div class="prog-bar"><div class="prog-fill" id="bar-r3" style="width:0%"></div></div>
+    <div class="prog-lbl" id="lbl-r3">0 / 12</div>
+  </div>
+</div>
+ 
+<div class="rtabs">
+  <button class="rtab active" onclick="switchR('r1')"><span class="rtab-num">Reading 1</span>Food Science</button>
+  <button class="rtab" onclick="switchR('r2')"><span class="rtab-num">Reading 2</span>Japanese Schools</button>
+  <button class="rtab" onclick="switchR('r3')"><span class="rtab-num">Reading 3</span>Student Portfolios</button>
+</div>
+ 
+<div class="content">
+  <div class="rpanel active" id="panel-r1">
+    <div class="stabs">
+      <button class="stab active" data-sub="text" onclick="switchSub('r1','text')">&#128214; Read the Text</button>
+      <button class="stab" data-sub="vocab" onclick="switchSub('r1','vocab')">&#128292; Vocabulary (12 words)</button>
+      <button class="stab" data-sub="quiz" onclick="switchSub('r1','quiz')">&#9999;&#65039; Comprehension Quiz</button>
+    </div>
+    <div class="spanel active" id="r1-text"></div>
+    <div class="spanel" id="r1-vocab"></div>
+    <div class="spanel" id="r1-quiz"></div>
+  </div>
+  <div class="rpanel" id="panel-r2">
+    <div class="stabs">
+      <button class="stab active" data-sub="text" onclick="switchSub('r2','text')">&#128214; Read the Text</button>
+      <button class="stab" data-sub="vocab" onclick="switchSub('r2','vocab')">&#128292; Vocabulary (12 words)</button>
+      <button class="stab" data-sub="quiz" onclick="switchSub('r2','quiz')">&#9999;&#65039; Comprehension Quiz</button>
+    </div>
+    <div class="spanel active" id="r2-text"></div>
+    <div class="spanel" id="r2-vocab"></div>
+    <div class="spanel" id="r2-quiz"></div>
+  </div>
+  <div class="rpanel" id="panel-r3">
+    <div class="stabs">
+      <button class="stab active" data-sub="text" onclick="switchSub('r3','text')">&#128214; Read the Text</button>
+      <button class="stab" data-sub="vocab" onclick="switchSub('r3','vocab')">&#128292; Vocabulary (12 words)</button>
+      <button class="stab" data-sub="quiz" onclick="switchSub('r3','quiz')">&#9999;&#65039; Comprehension Quiz</button>
+    </div>
+    <div class="spanel active" id="r3-text"></div>
+    <div class="spanel" id="r3-vocab"></div>
+    <div class="spanel" id="r3-quiz"></div>
+  </div>
+</div>
+ 
+<div class="save-bar">
+  <span>&#128190; Save your progress:</span>
+  <button onclick="saveProgress()">&#11015; Save JSON</button>
+  <button onclick="document.getElementById('loadInp').click()">&#11014; Load JSON</button>
+  <input type="file" id="loadInp" accept=".json" style="display:none" onchange="loadProgress(event)">
+  <button onclick="checkCert()">&#127942; Check Certificate</button>
+</div>
+ 
+<div class="overlay" id="certModal">
+  <div class="modal">
+    <button class="modal-x" onclick="document.getElementById('certModal').classList.remove('show')">&#10005;</button>
+    <div class="cert-icon">&#127942;</div>
+    <div class="cert-title">Reading Mastery</div>
+    <div class="cert-sub" id="certSub"></div>
+    <div class="cert-row" id="certScores"></div>
+    <button style="padding:11px 26px;background:var(--orange);color:#fff;border:none;border-radius:10px;cursor:pointer;font-family:Arial,sans-serif;font-size:14px;" onclick="window.print()">&#128438; Print Certificate</button>
+  </div>
+</div>
+ 
+<footer>GED-100 Develop English Language Skills &bull; Independent Reading Assessment 202520 &bull; <strong>Designed by Nazila Motahari</strong></footer>
+ 
+<script>
+// ===================== DATA =====================
+ 
+var readings = [
+ 
+// -------- READING 1: FOOD SCIENCE --------
+{
+  id:"r1", title:"Food Science",
+  paragraphs:[
+    {n:1,t:"From breakfast to dinner, our food gives us energy and keeps us healthy. Have you ever thought about the science behind your favorite foods? Why does the food we love taste so good and keep us strong? Food science is an amazing field that explores what we eat, how we make it, and what effect it has on our minds and bodies."},
+    {n:2,t:"Think of food science as a detective story about what happens to your food, from the farm to your plate. It is a mix of chemistry, biology, and even a little bit of physics. Scientists in this field study how food grows, how we cook it, and how it develops our bodies. This research helps scientists explain everything about food, from what gives flavor to tomatoes to how a small seed becomes a juicy fruit."},
+    {n:3,t:"Chemistry helps us understand what makes food taste good and why certain foods have special flavors. It allows scientists to discover what makes a tomato sour or why chocolate melts in your mouth. Chemistry helps us understand what happens when we cook food, such as when raw rice becomes soft or when baking flour becomes a delicious cake. Biology is another big part of food science. Biology studies the plants and animals that are used in producing food. Biologists work with other scientists to make sure that food is safe for us to eat and stays fresh for longer. They cool or freeze food in refrigerators and pack it safely."},
+    {n:4,t:"The field of food science is always changing and improving to make food healthy, tasty, and friendly to the environment. These changes create many jobs in food science, from using technology to making farming smarter and food safer. Whether you want to work on a farm, in a lab, or in a kitchen, there is a job for you in food science."},
+    {n:5,t:"Professionals like pharmacy technicians, healthcare workers, and life science technicians have important jobs in food science. Pharmacy technicians study the chemicals used in food or medicines. Healthcare workers make sure that food is handled and stored safely. They teach us about healthy eating habits and the safe handling of food. Medical assistants work with doctors and nurses to help patients make healthy food choices. Life science technicians study the effect plants and animals have on how food is grown."},
+    {n:6,t:"Nutrition is all about the good stuff like vitamins, minerals, proteins, and fats that keep you healthy. Therefore, medical assistants help by checking how much of the good stuff is in your favorite snacks and meals. Have you ever wondered what those numbers and words on food labels mean? Well, the next time you come across a food label, remember that it is like a map that shows you what is inside your food and where it came from. They show you things like calories (how much energy you get), ingredients (what is in your food), and allergens (things that some people are allergic to or that make them sick)."},
+    {n:7,t:"You may have also seen those best-before dates on food packs? This shows whether the food is fresh and safe. Food scientists work hard to see that your food will not make you sick. They study how to prevent germs (things that result in illness or disease) from growing, and how to store food so it stays fresh longer. They make sure that everything from a can of beans to frozen peas is safe to eat."},
+    {n:8,t:"However, food science has its challenges. Food shortage is a real problem for many people around the world. Scientists are studying ways to grow more food, without damaging the environment. They are making sure everyone in the world has enough to eat and are creating ways to reduce food waste. They are also looking for solutions to food allergies and health problems that result from the food we eat."},
+    {n:9,t:"The future of food science is exciting! Scientists are considering inventing new foods that are good for you and the environment. Who knows? Maybe one day you will be eating dinner or a tasty snack made from items grown in a lab. The next time you sit down to have a delicious meal, think about where your food came from and the science behind it. So, whether you are biting into a crisp apple or enjoying pizza with cheese, remember that all that great taste is thanks to the science and research into what and how we eat."}
+  ],
+  vocab:[
+    {w:"field",pos:"(noun)",def:"an area of study or work",ar:"مجال",ex:"Food science is an amazing field."},
+    {w:"flavor",pos:"(noun)",def:"the taste of food or drink",ar:"نكهة",ex:"Chemistry explains why foods have special flavors."},
+    {w:"chemistry",pos:"(noun)",def:"the science of substances and how they react",ar:"الكيمياء",ex:"Chemistry helps us understand what makes food taste good."},
+    {w:"biology",pos:"(noun)",def:"the science of living things — plants and animals",ar:"علم الأحياء",ex:"Biology studies the plants and animals used in producing food."},
+    {w:"nutrition",pos:"(noun)",def:"the process of getting nutrients your body needs from food",ar:"التغذية",ex:"Nutrition is all about vitamins, minerals, proteins, and fats."},
+    {w:"calories",pos:"(noun)",def:"units that measure the energy contained in food",ar:"سعرات حرارية",ex:"Food labels show calories — how much energy you get."},
+    {w:"ingredients",pos:"(noun)",def:"the items that are used to make a food or dish",ar:"مكونات",ex:"Food labels show ingredients — what is in your food."},
+    {w:"allergens",pos:"(noun)",def:"things that cause an allergic reaction in some people",ar:"مسببات الحساسية",ex:"Allergens are things some people are allergic to."},
+    {w:"germs",pos:"(noun)",def:"tiny organisms that cause illness or disease",ar:"جراثيم / ميكروبات",ex:"Scientists study how to prevent germs from growing in food."},
+    {w:"shortage",pos:"(noun)",def:"when there is not enough of something",ar:"نقص / شُح",ex:"Food shortage is a real problem for many people."},
+    {w:"environment",pos:"(noun)",def:"the natural world around us, including air, land, and water",ar:"البيئة",ex:"Scientists grow food without damaging the environment."},
+    {w:"prevent",pos:"(verb)",def:"to stop something from happening",ar:"يمنع / يحول دون",ex:"They study how to prevent germs from growing."}
+  ],
+  questions:[
+    {sk:"Skimming",p:null,q:"What is the MAIN TOPIC of the text?",opts:["How to cook healthy meals at home","The science of food — exploring what we eat, how it is made, and its effects on our bodies","Career opportunities in biology and chemistry","How to read and understand food labels"],c:1,exp:"The main idea is in paragraph 1: food science explores what we eat, how we make it, and what effect it has on our minds and bodies."},
+    {sk:"Skimming",p:4,q:"What is the MAIN PURPOSE of paragraph 4?",opts:["To explain how chemistry works in food production","To warn about dangers in food science jobs","To show that food science creates many different job opportunities","To describe how food labels are created"],c:2,exp:"Paragraph 4 says changes in food science \"create many jobs\" and lists examples like farming, labs, and kitchens."},
+    {sk:"Scanning",p:3,q:"According to paragraph 3, what does BIOLOGY study in food science?",opts:["The chemicals that give food its flavor","The physics of how food is cooked and packed","The plants and animals used in producing food","The best-before dates on food packaging"],c:2,exp:"Paragraph 3 states: \"Biology studies the plants and animals that are used in producing food.\""},
+    {sk:"Scanning",p:6,q:"According to paragraph 6, what THREE things do food labels show?",opts:["Price, weight, and country of origin","Calories, ingredients, and allergens","Best-before date, storage instructions, and brand name","Vitamins, minerals, and proteins"],c:1,exp:"Paragraph 6 lists three things on food labels: calories, ingredients, and allergens."},
+    {sk:"Scanning",p:7,q:"According to paragraph 7, what are GERMS?",opts:["Chemicals that give food its color","Things that give food its texture and shape","Things that result in illness or disease","A type of vitamin found naturally in food"],c:2,exp:"Paragraph 7 defines germs directly in brackets: \"things that result in illness or disease.\""},
+    {sk:"Referencing",p:3,q:"In paragraph 3: \"They cool or freeze food in refrigerators and pack it safely.\" Who does THEY refer to?",opts:["Chemistry scientists","Biologists","Pharmacy technicians","Life science technicians"],c:1,exp:"The previous sentence says: \"Biologists work with other scientists to make sure that food is safe.\" The \"they\" refers to biologists."},
+    {sk:"Referencing",p:6,q:"In paragraph 6: \"They show you things like calories, ingredients, and allergens.\" What does THEY refer to?",opts:["Food scientists","Medical assistants","Food labels","Healthcare workers"],c:2,exp:"The previous sentence introduces \"a food label\" as the topic. The pronoun \"they\" refers back to food labels."},
+    {sk:"Referencing",p:5,q:"In paragraph 5: \"They teach us about healthy eating habits.\" Who does THEY refer to?",opts:["Pharmacy technicians","Life science technicians","Healthcare workers","Medical assistants"],c:2,exp:"The sentence before says: \"Healthcare workers make sure that food is handled and stored safely.\" The \"they\" continues to refer to healthcare workers."},
+    {sk:"Inferencing",p:7,q:"WHY do food scientists study best-before dates? (paragraph 7)",opts:["To make food taste better and last longer","To help make food packaging more colourful","To ensure that food is safe and fresh to eat","To reduce the cost of food production"],c:2,exp:"Paragraph 7 says best-before dates show \"whether the food is fresh and safe\" — the purpose is food safety."},
+    {sk:"Inferencing",p:8,q:"What can we INFER from paragraph 8 about food science?",opts:["Food science has solved all food problems","Food science only focuses on making food taste better","Food science still faces major challenges like shortage and allergies","Food science is no longer changing or developing"],c:2,exp:"Paragraph 8 uses the word \"challenges\" and lists food shortage, food waste, and allergies as ongoing problems."},
+    {sk:"Vocabulary",p:1,q:"In paragraph 1, the word FIELD means:",opts:["A large area of green grass or farmland","An area of study or work","A type of agricultural farm","A chemical reaction in food science"],c:1,exp:"In academic English, \"field\" means an area of study. The context \"food science is an amazing field that explores...\" confirms this."},
+    {sk:"Vocabulary",p:6,q:"In paragraph 6, ALLERGENS are:",opts:["Types of vitamins that keep you healthy","Things that some people are allergic to or that make them sick","Special ingredients that improve the flavor of food","Chemicals used in food packaging and storage"],c:1,exp:"Paragraph 6 gives the definition in brackets: \"things that some people are allergic to or that make them sick.\""}
+  ]
+},
+ 
+// -------- READING 2: JAPANESE SCHOOLS --------
+{
+  id:"r2", title:"The Japanese School Education System",
+  paragraphs:[
+    {n:1,t:"The Japanese school education system consists of 12 years. The first 9 years of education, from elementary school (6 years) to junior high school (3 years), is mandatory in Japan. Mandatory means children must complete this part of their education. The next 3 years are for high school. In Japan, mandatory education starts at age six and ends at age fifteen at the end of junior high school. Almost 90% of students attend public (government) schools, while the other students go to private schools. Private schools are more expensive, but they have better facilities like gyms, computer labs and so on."},
+    {n:2,t:"The Japanese school education system is divided into five sections. Some are optional (students do not need to complete them), and some are mandatory. These are: Nursery school (optional), Kindergarten (optional), Elementary school (mandatory), Junior high school (mandatory), High School (optional). After students graduate from high school, they can choose university or vocational school (where students learn skills that involve working with their hands) for their higher education."},
+    {n:3,t:"When a child becomes a school student, they start spending most of their time at school. The school year starts in April and ends the following year in March. Classes are from Monday to Friday, with extra classes in schools on Saturdays. Parents rarely take their children to school. Students often go to school alone or with their classmates. Some students take the train or bus, while others prefer to ride a bike or walk if they live close to their school. Students never miss classes in Japan, and they always come to classes on time."},
+    {n:4,t:"Schools across Japan do not have facility staff. Students spend 10 to 15 minutes cleaning at the end of every school day. Similarly, right before any vacation, they spend 30 minutes to an hour cleaning the school. They mop the floor, wipe the windows, throw out the trash and arrange the desks. After students finish cleaning, the class leader calls the teacher, who then checks the classroom. If it is clean, students can go home. However, if it is dirty, they must clean it again until the teacher allows them to go. Most Japanese students pick up trash when they see it because they grew up knowing not to leave a mess behind them. Teachers and school staff clean their own offices or areas."},
+    {n:5,t:"Students also spend a lot of time at school because of their club activities. School club activities are a serious business in Japan. It is a chance for students to create friendships and learn self-discipline, but they are known for taking up most of the students time. Students choose a club to join at the start of their first year, and they rarely change. The most popular sports are baseball and football. Club activities happen all year round. Apart from school clubs, students have other activities throughout the year, such as sports day, school marathons, trips, and school festivals."},
+    {n:6,t:"Each school has different activities, but most schools have a school festival. A school festival, or bunkasai, is a unique event where students work together and show off their talents to their families and friends. It is usually the biggest event of the year, and students spend months preparing for the big day. It is a fun time and a way to increase their interest in learning and teamwork. During the festival, students use what they have learned in class to create performances and activities for everyone to enjoy. Anyone interested can join in the fun, including students, parents and teachers. Many school festivals feature song or dance performances."},
+    {n:7,t:"Everyone eats the same meal at Japanese public schools. This is different from most countries, where students have the option of buying lunch in a cafeteria or bringing their own lunch boxes. Students in Japan, on the other hand, are encouraged to eat the same type of meal and finish it within a time limit. Students must also serve their own lunch and clean up after themselves. Most Japanese schools do not have cafeterias where students can buy their meals. Students eat their meals with their teachers in their classrooms, which helps to form good relationships between teachers and students. However, sometimes schools allow students to bring a lunch box if it follows the school rules. This is called a bento and must not contain any sweets or any unhealthy food."},
+    {n:8,t:"If all of this sounds like a lot of hard work, many Japanese students also attend optional cram schools (juku) to catch up on the academic competition. These are special schools which help students improve their grades or pass entrance examinations. These programs start after school, at around 4 p.m. and, depending on the program, can end late in the evening."},
+    {n:9,t:"Students really do spend a lot of their time at school in Japan and the school system is very different to other countries around the world. However, students understand the importance and value of a good education. Success at school can lead to a successful career in the future."}
+  ],
+  vocab:[
+    {w:"mandatory",pos:"(adjective)",def:"required; must be done by law or rules",ar:"إلزامي",ex:"Elementary school is mandatory in Japan."},
+    {w:"optional",pos:"(adjective)",def:"not required; a matter of personal choice",ar:"اختياري",ex:"High school is optional in Japan."},
+    {w:"vocational",pos:"(adjective)",def:"related to a specific job or trade, usually practical skills",ar:"مهني / تقني",ex:"Students can choose a vocational school after high school."},
+    {w:"facility",pos:"(noun)",def:"a building or space used for a specific purpose",ar:"مرفق / منشأة",ex:"Private schools have better facilities like gyms and computer labs."},
+    {w:"self-discipline",pos:"(noun)",def:"the ability to control your own behaviour and follow rules",ar:"الانضباط الذاتي",ex:"Club activities help students learn self-discipline."},
+    {w:"bunkasai",pos:"(noun)",def:"a Japanese school festival where students show their talents",ar:"مهرجان المدرسة الياباني",ex:"The bunkasai is usually the biggest school event of the year."},
+    {w:"bento",pos:"(noun)",def:"a Japanese lunch box that students bring to school",ar:"صندوق الغداء الياباني",ex:"A bento must not contain sweets or unhealthy food."},
+    {w:"cram school",pos:"(noun)",def:"an extra school that helps students improve grades or pass exams",ar:"مدرسة التقوية (جوكو)",ex:"Many students attend cram schools (juku) after regular school."},
+    {w:"entrance examination",pos:"(noun)",def:"a test students must pass to be accepted into a school or university",ar:"امتحان القبول",ex:"Cram schools help students pass entrance examinations."},
+    {w:"graduate",pos:"(verb)",def:"to successfully complete a course of study at a school or university",ar:"يتخرج",ex:"After students graduate from high school, they can choose university."},
+    {w:"cafeteria",pos:"(noun)",def:"a place in a school or workplace where meals are bought and eaten",ar:"كافيتيريا / مقصف",ex:"Most Japanese schools do not have cafeterias."},
+    {w:"academic",pos:"(adjective)",def:"related to education and studying at school or university",ar:"أكاديمي / دراسي",ex:"Students attend cram schools to keep up with academic competition."}
+  ],
+  questions:[
+    {sk:"Skimming",p:null,q:"What is the MAIN TOPIC of this text?",opts:["How to become a teacher in Japan","The structure and daily life of the Japanese school system","Why Japan has the best education system in the world","How Japanese students prepare for university entrance exams"],c:1,exp:"The text covers the structure of Japanese education (paragraphs 1-2) and different aspects of school life including cleaning, clubs, festivals, meals, and cram schools."},
+    {sk:"Skimming",p:null,q:"Which SECTION of the text describes what students eat at school?",opts:["School Life in Japan","School Club Activities","Mealtime in Schools","Cram Schools"],c:2,exp:"The heading \"Mealtime in Schools\" introduces paragraph 7, which explains meals, cafeterias, and bento boxes."},
+    {sk:"Scanning",p:1,q:"How many years is MANDATORY education in Japan? (paragraph 1)",opts:["12 years","9 years","6 years","3 years"],c:1,exp:"Paragraph 1 states: \"The first 9 years of education, from elementary school (6 years) to junior high school (3 years), is mandatory.\""},
+    {sk:"Scanning",p:8,q:"At what TIME do cram schools start? (paragraph 8)",opts:["At 2:00 p.m.","At 3:00 p.m.","At 4:00 p.m.","At 5:00 p.m."],c:2,exp:"Paragraph 8 states: \"These programs start after school, at around 4 p.m.\""},
+    {sk:"Scanning",p:7,q:"What is a BENTO? (paragraph 7)",opts:["A type of Japanese sports club activity","A Japanese school festival with performances","A cram school program for exam preparation","A lunch box that students can bring to school"],c:3,exp:"Paragraph 7 explains: \"This is called a bento and must not contain any sweets or any unhealthy food.\""},
+    {sk:"Scanning",p:1,q:"What percentage of students attend PUBLIC schools in Japan? (paragraph 1)",opts:["Almost 75%","Almost 80%","Almost 90%","Almost 95%"],c:2,exp:"Paragraph 1 states: \"Almost 90% of students attend public (government) schools.\""},
+    {sk:"Referencing",p:4,q:"In paragraph 4: \"If it is clean, students can go home.\" What does IT refer to?",opts:["The school building","The classroom","The teacher's office","The school entrance"],c:1,exp:"The class leader calls the teacher \"who then checks the classroom.\" The word \"it\" refers back to the classroom."},
+    {sk:"Referencing",p:5,q:"In paragraph 5: \"they are known for taking up most of the students' time.\" What does THEY refer to?",opts:["School festivals","Club activities","Cram schools","School marathons"],c:1,exp:"The sentence before says \"School club activities are a serious business in Japan.\" The \"they\" refers to club activities."},
+    {sk:"True or False",p:2,q:"TRUE or FALSE: In Japan, elementary school is OPTIONAL — students do not have to attend.",opts:["TRUE — elementary school is optional in Japan","FALSE — elementary school is mandatory in Japan"],c:1,exp:"Paragraph 2 lists elementary school as mandatory. Paragraph 1 also confirms that the first 9 years (including 6 years of elementary school) is mandatory."},
+    {sk:"Inferencing",p:7,q:"WHY do Japanese students eat meals in the classroom with their teachers? (paragraph 7)",opts:["Because there is no space for a cafeteria in Japanese schools","Because it is cheaper than buying food in a cafeteria","Because it helps to form good relationships between teachers and students","Because students are not allowed to choose their own food"],c:2,exp:"Paragraph 7 gives the reason directly: \"Students eat their meals with their teachers in their classrooms, which helps to form good relationships.\""},
+    {sk:"Vocabulary",p:1,q:"In paragraph 1, the word MANDATORY means:",opts:["Something you can choose to do freely","Something that must be completed — it is required","Something that is very expensive","Something that is provided by the government for free"],c:1,exp:"Paragraph 1 gives the definition immediately after the word: \"Mandatory means children must complete this part of their education.\""},
+    {sk:"Inferencing",p:8,q:"What can we INFER about cram schools from paragraph 8?",opts:["All Japanese students are required to attend cram schools","Cram schools replace regular schools in Japan","Cram schools are for students who want to improve their academic results","Cram schools are free and provided by the government"],c:2,exp:"Paragraph 8 describes them as \"optional\" and says they help students \"improve their grades or pass entrance examinations\" — they are for students seeking academic improvement."}
+  ]
+},
+ 
+// -------- READING 3: STUDENT PORTFOLIOS --------
+{
+  id:"r3", title:"Student Portfolios",
+  paragraphs:[
+    {n:1,t:"Portfolios have been around for a very long time. The word portfolio comes from the Italian word portafoglio, which referred to a set of pictures or drawings. They were originally used by artists and architects who organized examples of their work into a folder. These days, modern portfolios are mostly digital and used by students, job seekers, employees and people who want to have their work and achievements displayed in one place. A student portfolio is a collection of a student's work that is put together over time to show their progress, skills, and achievements. It could include examples of projects, assignments, and self-reflections. They can be digital or on paper and depend on the type of course or project students are working on."},
+    {n:2,t:"There are many types of portfolios these days, and it is important for students to consider the purpose of their portfolios and what they want people to see. The first kind of portfolio, and the most common, is a digital portfolio. Most colleges and universities provide students with a digital platform such as Blackboard Learn to display their work. Some students prefer to use websites, while others prefer to use individual blogs. This latter method was once very popular, but it is less common now. There are still those who use physical portfolios like folders and binders, although some people now consider them outdated. Perhaps only artists, photographers and architects keep hard copies of their work these days."},
+    {n:3,t:"Student portfolios give students the opportunity to showcase their skills, knowledge, and improvement in a fun and engaging way. Students must take responsibility for creating their own portfolios. They need to show their best work and decide which projects and assignments reflect their achievements the best. When creating a portfolio, students should collect, save, and organize their work and materials. They also need to think about what material they will include in the portfolio and how it will benefit them. It is surprisingly easy to set up a portfolio: choose samples of your work that are good quality, varied and interesting. However, in a recent study 55% of students felt they did not have enough training to create a portfolio, while just over 60% of students said they did not have enough time to update their portfolios and 45% thought that portfolios were not useful for their courses."},
+    {n:4,t:"Portfolios can be used for many reasons, but the most popular reasons include following a student's progress, grading student work, and collecting evidence that the work has been completed. Teachers can use a portfolio to find areas where a student needs additional study support and practice. It can also be used to check if the student understands the work and if they are on the right learning path. Finally, it provides a location where students can keep their work in one place where they can use it for future job applications or continuing their studies at other colleges and universities. Employers generally request that job candidates send not only a resume or CV, but also a link to their digital portfolio because it provides recent proof of their achievements and accomplishments."},
+    {n:5,t:"There are many advantages of having a portfolio for students. Firstly, it puts them in charge of their learning experience. They can also use it when applying for jobs because not only are their achievements grouped together, but they can also be presented to employers in a professional and organized way. Another benefit is that it improves self-reflection because students can look back at what they have completed and discover areas they would like to improve."},
+    {n:6,t:"A portfolio collection of a student's work also has many benefits for teachers. They provide a lot of information in an organized way. They help teachers to think about their own teaching methods and allow them to identify areas to improve their teaching skills and practices. Teachers can also use portfolios to find strengths and weaknesses in their students' work. Then they can give feedback to students and provide extra support where needed."},
+    {n:7,t:"There are many benefits of having a portfolio, so it is important that students start one as soon as possible. Each piece of work that a student completes has value and students can also keep adding work to their portfolio, even after they graduate. In a fast-paced digital world, students need to stay up to date with technology and they need to be ready when opportunities come their way. By quickly being able to access their portfolio online at the press of a button, students will be better able to showcase their abilities, apply for jobs, take further courses at universities, and follow their career paths."}
+  ],
+  vocab:[
+    {w:"portfolio",pos:"(noun)",def:"a collection of a person's work, projects, and achievements",ar:"ملف الأعمال / حافظة",ex:"A student portfolio shows progress, skills, and achievements."},
+    {w:"digital",pos:"(adjective)",def:"related to computer technology; stored or displayed electronically",ar:"رقمي",ex:"Most modern portfolios are digital."},
+    {w:"showcase",pos:"(verb)",def:"to display or present something proudly so others can see it",ar:"يعرض / يُبرز",ex:"Portfolios allow students to showcase their skills."},
+    {w:"achievements",pos:"(noun)",def:"things you have successfully done, especially through hard work and effort",ar:"إنجازات",ex:"A portfolio displays a student's achievements in one place."},
+    {w:"self-reflection",pos:"(noun)",def:"thinking carefully about your own feelings, actions, and progress",ar:"التأمل الذاتي",ex:"Portfolios improve self-reflection because students look back at their work."},
+    {w:"outdated",pos:"(adjective)",def:"no longer modern; old-fashioned or not commonly used anymore",ar:"قديم / متقادم",ex:"Some people now consider physical portfolios outdated."},
+    {w:"evidence",pos:"(noun)",def:"facts or proof that show something is true or has been done",ar:"دليل / شاهد",ex:"Portfolios collect evidence that the work has been completed."},
+    {w:"progress",pos:"(noun)",def:"improvement or positive development over a period of time",ar:"تقدم",ex:"Teachers use portfolios to follow a student's progress."},
+    {w:"accomplishments",pos:"(noun)",def:"things that have been successfully achieved or completed",ar:"إنجازات / منجزات",ex:"Employers want recent proof of your achievements and accomplishments."},
+    {w:"feedback",pos:"(noun)",def:"information or comments given to help someone improve their work",ar:"تغذية راجعة",ex:"Teachers give feedback to students after looking at their portfolios."},
+    {w:"platform",pos:"(noun)",def:"a digital space or system used to display or share work online",ar:"منصة رقمية",ex:"Blackboard Learn is a digital platform for displaying student work."},
+    {w:"organize",pos:"(verb)",def:"to arrange things in a clear, tidy, and logical way",ar:"ينظم / يرتب",ex:"Students should organize their work and materials carefully."}
+  ],
+  questions:[
+    {sk:"Skimming",p:null,q:"What is the MAIN TOPIC of the text?",opts:["How to use Blackboard Learn at university","The history, types, and benefits of student portfolios","Why students need a resume and CV for job applications","How to pass university entrance examinations"],c:1,exp:"The text covers the history (para 1), types (para 2), how to create one (para 3), and the many benefits for students and teachers (paras 4-7)."},
+    {sk:"Skimming",p:6,q:"Which paragraph explains the BENEFITS OF PORTFOLIOS FOR TEACHERS?",opts:["Paragraph 4","Paragraph 5","Paragraph 6","Paragraph 7"],c:2,exp:"Paragraph 6 begins: \"A portfolio collection of a student's work also has many benefits for teachers.\""},
+    {sk:"Scanning",p:1,q:"According to paragraph 1, where does the word PORTFOLIO originally come from?",opts:["A French word meaning a folder of drawings","An Italian word referring to pictures or drawings","A Latin word meaning a collection of work","An English word meaning a professional folder"],c:1,exp:"Paragraph 1 states: \"The word portfolio comes from the Italian word portafoglio, which referred to a set of pictures or drawings.\""},
+    {sk:"Scanning",p:3,q:"According to paragraph 3, what percentage of students felt they did NOT have enough training to create a portfolio?",opts:["45%","55%","60%","65%"],c:1,exp:"Paragraph 3 states: \"55% of students felt they did not have enough training to create a portfolio.\""},
+    {sk:"Scanning",p:2,q:"According to paragraph 2, what is the MOST COMMON type of portfolio today?",opts:["A physical portfolio in a folder or binder","A personal blog portfolio","A digital portfolio","An artist's hard-copy folder"],c:2,exp:"Paragraph 2 states: \"The first kind of portfolio, and the most common, is a digital portfolio.\""},
+    {sk:"Referencing",p:1,q:"In paragraph 1: \"They were originally used by artists and architects.\" What does THEY refer to?",opts:["Digital portfolios of today","Modern student portfolios","Portfolios — the original sets of pictures and drawings","Students and job seekers"],c:2,exp:"The sentence before mentions the Italian word portafoglio, which referred to a set of pictures or drawings. The \"they\" refers to these early portfolios."},
+    {sk:"Referencing",p:4,q:"In paragraph 4: \"it provides a location where students can keep their work in one place.\" What does IT refer to?",opts:["A resume or CV","A digital platform like Blackboard","A portfolio","An employer's website"],c:2,exp:"The whole paragraph is about portfolios and what they can be used for. The \"it\" refers to a portfolio."},
+    {sk:"Referencing",p:5,q:"In paragraph 5: \"They can also use it when applying for jobs.\" Who does THEY refer to?",opts:["Teachers","Employers","Students","University professors"],c:2,exp:"Paragraph 5 begins \"There are many advantages of having a portfolio for students.\" The subject throughout paragraph 5 is students."},
+    {sk:"Inferencing",p:4,q:"WHY do employers ask for a digital portfolio in addition to a CV? (paragraph 4)",opts:["Because a CV is usually too short to read","Because it provides recent proof of achievements and accomplishments","Because digital portfolios are more colourful than CVs","Because CVs are no longer accepted by most companies"],c:1,exp:"Paragraph 4 gives the reason directly: \"because it provides recent proof of their achievements and accomplishments.\""},
+    {sk:"Inferencing",p:2,q:"What does the author SUGGEST about physical portfolios in paragraph 2?",opts:["They are still very popular with all students and professionals","They are becoming less common and some consider them outdated","They are better than digital portfolios for showing creativity","They are required by most universities and employers today"],c:1,exp:"Paragraph 2 says physical portfolios are considered \"outdated\" and using blogs \"is less common now.\" The suggestion is that physical formats are declining."},
+    {sk:"Vocabulary",p:2,q:"In paragraph 2, the word OUTDATED means:",opts:["Very expensive to create and maintain","No longer modern or commonly used","Very difficult to organize and update","Well-organized and professionally presented"],c:1,exp:"In context, physical portfolios are described as something \"some people now consider outdated\" — meaning no longer fashionable or current."},
+    {sk:"Vocabulary",p:5,q:"In paragraph 5, SELF-REFLECTION means:",opts:["Looking at yourself in a mirror to check your appearance","Asking your teacher to give you detailed written feedback","Thinking carefully about your own work and areas you want to improve","Writing a summary of a reading text for your portfolio"],c:2,exp:"Paragraph 5 explains: portfolios \"improve self-reflection because students can look back at what they have completed and discover areas they would like to improve.\""}
+  ]
+}
+ 
+]; // end readings array
+ 
+// ===================== STATE =====================
+var state = {
+  answers:{r1:{},r2:{},r3:{}},
+  scores:{r1:0,r2:0,r3:0},
+  submitted:{r1:false,r2:false,r3:false}
+};
+ 
+// ===================== RENDER =====================
+function renderAll(){
+  readings.forEach(function(r){ renderText(r); renderVocab(r); renderQuiz(r); });
+  updateProgress();
+}
+ 
+function renderText(r){
+  var h = '<div class="text-card"><h2>' + r.title + '</h2>';
+  r.paragraphs.forEach(function(p){
+    h += '<div class="para-blk"><div class="para-lbl">Paragraph ' + p.n + '</div><div>' + p.t + '</div></div>';
+  });
+  h += '</div>';
+  document.getElementById(r.id+'-text').innerHTML = h;
+}
+ 
+function renderVocab(r){
+  var h = '<div class="vocab-intro">&#128218; <strong>' + r.vocab.length + ' key vocabulary words</strong> from this text. Click each card to flip it and see the Arabic meaning and English definition.</div>';
+  h += '<div class="vocab-grid">';
+  r.vocab.forEach(function(v,i){
+    var id = r.id+'-vc-'+i;
+    h += '<div class="vcard" id="'+id+'" onclick="flipCard(\''+id+'\')">';
+    h += '<div class="vcard-inner">';
+    h += '<div class="vfront"><div class="vword">'+v.w+'</div><div class="vpos">'+v.pos+'</div><div class="vex">'+v.ex+'</div><div class="vhint">&#128161; Click to flip</div></div>';
+    h += '<div class="vback"><div class="vdef">'+v.def+'</div><div class="varabic">'+v.ar+'</div></div>';
+    h += '</div></div>';
+  });
+  h += '</div>';
+  document.getElementById(r.id+'-vocab').innerHTML = h;
+}
+ 
+function renderQuiz(r){
+  var total = r.questions.length;
+  var sc = state.scores[r.id];
+  var sub = state.submitted[r.id];
+  var pct = sub ? Math.round(sc/total*100) : 0;
+ 
+  var h = '<div class="quiz-hdr">';
+  h += '<div class="quiz-score-box"><div style="font-size:10px;opacity:.7;font-family:Arial,sans-serif;">YOUR SCORE</div>';
+  h += '<span class="quiz-score-big">'+sc+'</span> / '+total+'</div>';
+  h += '<div class="quiz-info"><strong>Skill types:</strong> Skimming &bull; Scanning &bull; Referencing &bull; Inferencing &bull; Vocabulary in Context<br>';
+  h += 'You need <strong>10 / 12 (80%)</strong> to pass. Choose ONE best answer per question.</div>';
+  h += '<button class="quiz-reset" onclick="resetQuiz(\''+r.id+'\')">&#8635; Reset</button>';
+  h += '</div>';
+ 
+  r.questions.forEach(function(q,qi){
+    var ans = state.answers[r.id][qi];
+    var cardCls = 'qcard';
+    if(sub && ans !== undefined){ cardCls += ans===q.c ? ' correct' : ' incorrect'; }
+    h += '<div class="'+cardCls+'">';
+    h += '<div class="qmeta"><span class="qnum">Q'+(qi+1)+'</span><span class="qskill">'+q.sk+'</span>';
+    if(q.p){ h += '<span class="qpara">&#128214; Para '+q.p+'</span>'; }
+    h += '</div>';
+    h += '<div class="qtext">'+q.q+'</div>';
+    h += '<div class="qopts">';
+    q.opts.forEach(function(opt,oi){
+      var cls = 'qopt';
+      var dis = '';
+      if(sub){
+        dis = 'disabled';
+        if(oi===q.c) cls += ' ok';
+        else if(ans===oi && oi!==q.c) cls += ' wrong';
+      } else if(ans===oi){ cls += ' sel'; }
+      h += '<button class="'+cls+'" '+dis+' onclick="pick(\''+r.id+'\','+qi+','+oi+')">'+String.fromCharCode(65+oi)+') '+opt+'</button>';
+    });
+    h += '</div>';
+    if(sub){
+      h += '<div class="qexp show">&#128161; <strong>Explanation:</strong> '+q.exp+'</div>';
+    }
+    h += '</div>';
+  });
+ 
+  if(!sub){
+    h += '<div class="submit-row"><button class="submit-btn" onclick="submitQuiz(\''+r.id+'\')">Submit Answers &#10003;</button></div>';
+  } else {
+    var pass = sc >= 10;
+    h += '<div class="result-banner show '+(pass?'pass':'fail')+'">';
+    if(pass){
+      h += '<h3>&#127881; Excellent! You Passed!</h3>';
+      h += '<p>You scored <strong>'+sc+' out of '+total+' ('+pct+'%)</strong> &mdash; above the 80% pass mark. Great work!</p>';
+    } else {
+      h += '<h3>&#128532; Not There Yet &mdash; Keep Trying!</h3>';
+      h += '<p>You scored <strong>'+sc+' out of '+total+' ('+pct+'%)</strong>. You need 10/12 to pass. Read the explanations carefully, then try again.</p>';
+      h += '<button class="retry-btn" onclick="resetQuiz(\''+r.id+'\')">&#8635; Try Again</button>';
+    }
+    h += '</div>';
+  }
+ 
+  document.getElementById(r.id+'-quiz').innerHTML = h;
+}
+ 
+// ===================== ACTIONS =====================
+function flipCard(id){ document.getElementById(id).classList.toggle('flipped'); }
+ 
+function pick(rid, qi, oi){
+  if(state.submitted[rid]) return;
+  state.answers[rid][qi] = oi;
+  // highlight selection
+  var panel = document.getElementById(rid+'-quiz');
+  var cards = panel.querySelectorAll('.qcard');
+  var qcard = cards[qi];
+  qcard.querySelectorAll('.qopt').forEach(function(btn,i){
+    btn.classList.toggle('sel', i===oi);
+  });
+}
+ 
+function submitQuiz(rid){
+  var r = readings.find(function(x){ return x.id===rid; });
+  var answered = Object.keys(state.answers[rid]).length;
+  if(answered < r.questions.length){
+    if(!confirm('You still have '+(r.questions.length-answered)+' unanswered question(s). Submit anyway?')) return;
+  }
+  var sc = 0;
+  r.questions.forEach(function(q,qi){
+    if(state.answers[rid][qi]===q.c) sc++;
+  });
+  state.scores[rid] = sc;
+  state.submitted[rid] = true;
+  renderQuiz(r);
+  updateProgress();
+  if(sc >= 10){
+    setTimeout(confetti, 300);
+    setTimeout(checkCert, 2000);
+  }
+}
+ 
+function resetQuiz(rid){
+  state.answers[rid] = {};
+  state.scores[rid] = 0;
+  state.submitted[rid] = false;
+  var r = readings.find(function(x){ return x.id===rid; });
+  renderQuiz(r);
+  updateProgress();
+}
+ 
+function updateProgress(){
+  readings.forEach(function(r){
+    var sc = state.scores[r.id];
+    var sub = state.submitted[r.id];
+    var pct = sub ? Math.round(sc/12*100) : 0;
+    var bar = document.getElementById('bar-'+r.id);
+    var lbl = document.getElementById('lbl-'+r.id);
+    if(bar) bar.style.width = pct+'%';
+    if(lbl){
+      var pass = sub && sc>=10;
+      lbl.innerHTML = sc+' / 12' + (pass ? '<span class="badge-pass">&#10003; PASSED</span>' : '');
+    }
+  });
+}
+ 
+// ===================== NAVIGATION =====================
+function switchR(rid){
+  var tabs = document.querySelectorAll('.rtab');
+  var panels = document.querySelectorAll('.rpanel');
+  readings.forEach(function(r,i){
+    tabs[i].classList.toggle('active', r.id===rid);
+    panels[i].classList.toggle('active', r.id===rid);
+  });
+}
+ 
+function switchSub(rid, sub){
+  var panel = document.getElementById('panel-'+rid);
+  panel.querySelectorAll('.stab').forEach(function(t){
+    t.classList.toggle('active', t.getAttribute('data-sub')===sub);
+  });
+  panel.querySelectorAll('.spanel').forEach(function(p){
+    p.classList.toggle('active', p.id===rid+'-'+sub);
+  });
+}
+ 
+// ===================== CERTIFICATE =====================
+function checkCert(){
+  var passedCount = readings.filter(function(r){
+    return state.submitted[r.id] && state.scores[r.id] >= 10;
+  }).length;
+  var allPass = passedCount === 3;
+ 
+  var subEl = document.getElementById('certSub');
+  var scEl = document.getElementById('certScores');
+ 
+  subEl.textContent = allPass
+    ? 'Congratulations! You have passed all three reading comprehension quizzes!'
+    : 'You have passed ' + passedCount + ' out of 3 readings. Keep studying to pass all three!';
+ 
+  var sh = '';
+  readings.forEach(function(r){
+    var sc = state.scores[r.id];
+    var sub = state.submitted[r.id];
+    var pct = sub ? Math.round(sc/12*100) : 0;
+    sh += '<div class="cert-item"><span class="big">'+(sub?pct+'%':'—')+'</span>'+r.title+'</div>';
+  });
+  scEl.innerHTML = sh;
+  document.getElementById('certModal').classList.add('show');
+}
+ 
+// ===================== SAVE / LOAD =====================
+function saveProgress(){
+  var blob = new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url; a.download = 'GED100-SA1-progress.json'; a.click();
+  URL.revokeObjectURL(url);
+}
+ 
+function loadProgress(e){
+  var file = e.target.files[0];
+  if(!file) return;
+  var reader = new FileReader();
+  reader.onload = function(ev){
+    try{
+      state = JSON.parse(ev.target.result);
+      renderAll();
+      alert('Progress loaded successfully!');
+    } catch(err){ alert('Error: please use a valid GED100 progress JSON file.'); }
+  };
+  reader.readAsText(file);
+}
+ 
+// ===================== CONFETTI =====================
+function confetti(){
+  var cv = document.getElementById('confettiCanvas');
+  var ctx = cv.getContext('2d');
+  cv.width = window.innerWidth; cv.height = window.innerHeight;
+  var parts = [];
+  var cols = ['#E07B39','#2C5282','#16A34A','#F59E0B','#EC4899','#8B5CF6','#06B6D4'];
+  for(var i=0;i<120;i++){
+    parts.push({x:Math.random()*cv.width, y:Math.random()*cv.height-cv.height,
+      w:Math.random()*10+4, h:Math.random()*6+3,
+      color:cols[Math.floor(Math.random()*cols.length)],
+      vx:(Math.random()-.5)*3, vy:Math.random()*3+2, r:Math.random()*Math.PI*2});
+  }
+  var frame=0;
+  function draw(){
+    ctx.clearRect(0,0,cv.width,cv.height);
+    parts.forEach(function(p){
+      ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.r);
+      ctx.fillStyle=p.color; ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);
+      ctx.restore();
+      p.x+=p.vx; p.y+=p.vy; p.r+=0.05;
+      if(p.y>cv.height) p.y=-20;
+    });
+    frame++;
+    if(frame<160) requestAnimationFrame(draw);
+    else ctx.clearRect(0,0,cv.width,cv.height);
+  }
+  draw();
+}
+ 
+// ===================== INIT =====================
+renderAll();
+</script>
+</body>
+</html>
